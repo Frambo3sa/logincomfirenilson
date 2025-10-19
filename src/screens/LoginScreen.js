@@ -1,4 +1,3 @@
-// src/screens/LoginScreen.js
 import React, { useState } from 'react';
 import { View, StyleSheet, Alert } from 'react-native';
 import { Input, Button, Text } from 'react-native-elements';
@@ -20,24 +19,37 @@ export default function LoginScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text h3 style={{ marginBottom: 20 }}>Login</Text>
+      <Text h3 style={styles.title}>Bem-vindo de volta!</Text>
+
       <Input
         placeholder="Email"
-        leftIcon={{ type: 'material', name: 'email' }}
+        leftIcon={{ type: 'material', name: 'email', color: '#3F51B5' }}
         onChangeText={setEmail}
         value={email}
+        inputStyle={{ color: '#333' }}
+        containerStyle={styles.inputContainer}
       />
       <Input
         placeholder="Senha"
-        leftIcon={{ type: 'material', name: 'lock' }}
+        leftIcon={{ type: 'material', name: 'lock', color: '#3F51B5' }}
         secureTextEntry
         onChangeText={setSenha}
         value={senha}
+        inputStyle={{ color: '#333' }}
+        containerStyle={styles.inputContainer}
       />
-      <Button title="Entrar" onPress={handleLogin} containerStyle={{ width: '80%' }} />
+
+      <Button
+        title="Entrar"
+        onPress={handleLogin}
+        buttonStyle={styles.button}
+        titleStyle={{ fontWeight: 'bold' }}
+      />
+
       <Button
         title="Criar conta"
         type="clear"
+        titleStyle={styles.linkText}
         onPress={() => navigation.navigate('Register')}
       />
     </View>
@@ -47,8 +59,28 @@ export default function LoginScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#E3F2FD', // azul pastel
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#fafafa',
+    padding: 25,
+  },
+  title: {
+    marginBottom: 40,
+    color: '#3F51B5',
+  },
+  inputContainer: {
+    width: '90%',
+    marginBottom: 15,
+  },
+  button: {
+    backgroundColor: '#FFEE58', // amarelo pastel
+    borderRadius: 25,
+    paddingVertical: 12,
+    width: '90%',
+  },
+  linkText: {
+    color: '#3F51B5',
+    marginTop: 10,
+    fontWeight: 'bold',
   },
 });

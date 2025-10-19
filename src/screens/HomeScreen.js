@@ -1,4 +1,3 @@
-// src/screens/HomeScreen.js
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Text, Button } from 'react-native-elements';
@@ -13,10 +12,11 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text h3>Bem-vindo!</Text>
+      <Text h2 style={styles.title}>Tá logando certinho, tá vendo? 😎</Text>
       <Button
         title="Sair"
-        containerStyle={{ marginTop: 20, width: '60%' }}
+        buttonStyle={styles.button}
+        titleStyle={{ fontWeight: 'bold' }}
         onPress={handleLogout}
       />
     </View>
@@ -26,7 +26,20 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#FFF8E1', // amarelo pastel
     justifyContent: 'center',
     alignItems: 'center',
+    padding: 20,
+  },
+  title: {
+    color: '#3F51B5', // azul pastel
+    textAlign: 'center',
+    marginBottom: 40,
+  },
+  button: {
+    backgroundColor: '#3F51B5',
+    borderRadius: 25,
+    paddingHorizontal: 30,
+    paddingVertical: 12,
   },
 });
