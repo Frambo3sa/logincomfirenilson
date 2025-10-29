@@ -1,10 +1,113 @@
-import React from 'react';
-import { View, StyleSheet } from 'react-native';
-import { Text, Button } from 'react-native-elements';
-import { auth } from '../firebaseConfig';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, FlatList, TextInput, Alert } from 'react-native';
+import { Text, Button, ListItem, Icon } from 'react-native-elements';
+import axios from 'axios';
 import { signOut } from 'firebase/auth';
+import { auth, databaseURL } from '../firebaseConfig';
 
 export default function HomeScreen({ navigation }) {
+  const [nome, setNome] = useState('');
+  const [telefone, setTelefone] = useState('');
+  const [contatos, setContatos] = useState([]);
+  const [editandoId, setEditandoId] = useState(null); // 🔄 controla se está editando
+
+  // Carrega contatos ao iniciar
+  useEffect(() => {
+    carregarContatos();
+  }, []);
+
+  // 🔽 Buscar contatos do Firebase
+  const carregarContatos = async () => {
+  try {
+    const response = await axios.get(`${databaseURL}/contatos.json`);
+    if (response.data) {
+      const data = Object.entries(response.data).map(([id, value]) => ({
+        id,
+        nome: value.nome,
+        telefone: value.telefone,
+      }));
+      setContatos(data);
+    } else {
+      setContatos([]);
+    }
+  } catch (error) {
+    Alert.alert('Erro', 'Não foi possível carregar os contatos.');
+    console.error('Erro ao carregar:', error);
+  }
+};
+
+  // ➕ Adicionar novo contato
+  const adicionarContato = async () => {
+    if (!nome.trim() || !telefone.trim()) {
+      Alert.alert('Atenção', 'Preencha nome e telefone.');
+      return;
+    }
+
+    try {
+      await axios.post(`${databaseURL}/contatos.json`, { nome, telefone });
+      setNome('');
+      setTelefone('');
+      carregarContatos();
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível adicionar o contato.');
+      console.error(error);
+    }
+  };
+
+  // ✏️ Editar contato existente
+  const editarContato = (contato) => {
+    setEditandoId(contato.id);
+    setNome(contato.nome);
+    setTelefone(contato.telefone);
+  };
+
+  // 💾 Salvar edição
+  const salvarEdicao = async () => {
+    if (!nome.trim() || !telefone.trim()) {
+      Alert.alert('Atenção', 'Preencha nome e telefone.');
+      return;
+    }
+
+    try {
+      await axios.put(`${databaseURL}/contatos/${editandoId}.json`, { nome, telefone });
+      setNome('');
+      setTelefone('');
+      setEditandoId(null);
+      carregarContatos();
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível editar o contato.');
+      console.error(error);
+    }
+  };
+
+  // ❌ Excluir contato
+const excluirContato = async (id) => {
+  if (!id) {
+    Alert.alert('Erro', 'ID do contato inválido.');
+    console.error('ID inválido:', id);
+    return;
+  }
+
+  Alert.alert('Excluir', 'Deseja realmente excluir este contato?', [
+    { text: 'Cancelar', style: 'cancel' },
+    {
+      text: 'Excluir',
+      style: 'destructive',
+      onPress: async () => {
+        try {
+          console.log('Excluindo contato com ID:', id);
+          await axios.delete(`${databaseURL}/contatos/${id}.json`);
+          carregarContatos();
+        } catch (error) {
+          Alert.alert('Erro', 'Não foi possível excluir o contato.');
+          console.error('Erro ao excluir contato:', error);
+        }
+      },
+    },
+  ]);
+};
+
+  // 🚪 Logout
   const handleLogout = async () => {
     await signOut(auth);
     navigation.replace('Login');
@@ -12,11 +115,67 @@ export default function HomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      <Text h2 style={styles.title}>Tá logando certinho, tá vendo? 😎</Text>
+      <Text h3 style={styles.title}>📞 Lista Telefônica</Text>
+
+      <TextInput
+        style={styles.input}
+        placeholder="Nome"
+        value={nome}
+        onChangeText={setNome}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Telefone"
+        value={telefone}
+        keyboardType="phone-pad"
+        onChangeText={setTelefone}
+      />
+
+      {editandoId ? (
+        <Button
+          title="Salvar Edição"
+          buttonStyle={[styles.addButton, { backgroundColor: '#FFA000' }]}
+          onPress={salvarEdicao}
+        />
+      ) : (
+        <Button
+          title="Adicionar Contato"
+          buttonStyle={styles.addButton}
+          onPress={adicionarContato}
+        />
+      )}
+
+      <FlatList
+        data={contatos}
+        keyExtractor={item => item.id}
+        renderItem={({ item }) => (
+          <ListItem bottomDivider>
+            <Icon name="person" color="#3F51B5" />
+            <ListItem.Content>
+              <ListItem.Title>{item.nome}</ListItem.Title>
+              <ListItem.Subtitle>{item.telefone}</ListItem.Subtitle>
+            </ListItem.Content>
+
+            <Icon
+              name="edit"
+              type="material"
+              color="#FFA000"
+              onPress={() => editarContato(item)}
+            />
+            <Icon
+              name="delete"
+              type="material"
+              color="#F44336"
+              onPress={() => excluirContato(item.id)}
+            />
+
+          </ListItem>
+        )}
+      />
+
       <Button
         title="Sair"
-        buttonStyle={styles.button}
-        titleStyle={{ fontWeight: 'bold' }}
+        buttonStyle={styles.logoutButton}
         onPress={handleLogout}
       />
     </View>
@@ -26,20 +185,30 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FFF8E1', // amarelo pastel
-    justifyContent: 'center',
-    alignItems: 'center',
+    backgroundColor: '#FFF8E1',
     padding: 20,
   },
   title: {
-    color: '#3F51B5', // azul pastel
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: 20,
+    color: '#3F51B5',
   },
-  button: {
+  input: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#CCC',
+    borderRadius: 10,
+    padding: 10,
+    marginBottom: 10,
+  },
+  addButton: {
     backgroundColor: '#3F51B5',
     borderRadius: 25,
-    paddingHorizontal: 30,
-    paddingVertical: 12,
+    marginBottom: 20,
+  },
+  logoutButton: {
+    backgroundColor: '#F44336',
+    borderRadius: 25,
+    marginTop: 20,
   },
 });

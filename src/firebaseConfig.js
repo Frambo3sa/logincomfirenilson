@@ -1,4 +1,3 @@
-// src/firebaseConfig.js
 import { initializeApp } from "firebase/app";
 import { getAuth } from "firebase/auth";
 
@@ -12,4 +11,9 @@ const firebaseConfig = {
 };
 
 const app = initializeApp(firebaseConfig);
-export const auth = getAuth(app);
+const auth = getAuth(app);
+
+// ✅ URL do banco
+const databaseURL = "https://chiquinho-c79d3-default-rtdb.firebaseio.com";
+
+export { app, auth, databaseURL };
