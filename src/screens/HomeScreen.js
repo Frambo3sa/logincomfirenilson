@@ -11,12 +11,12 @@ export default function HomeScreen({ navigation }) {
   const [contatos, setContatos] = useState([]);
   const [editandoId, setEditandoId] = useState(null);
 
-  // 🔽 Carrega contatos ao iniciar
+  
   useEffect(() => {
     carregarContatos();
   }, []);
 
-  // 🧠 Buscar contatos do Firebase
+
   const carregarContatos = async () => {
     try {
       const response = await axios.get(`${databaseURL}/contatos.json`);
@@ -36,7 +36,7 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // ➕ Adicionar novo contato
+
   const adicionarContato = async () => {
     if (!nome.trim() || !telefone.trim()) {
       Alert.alert('Atenção', 'Preencha nome e telefone.');
@@ -54,14 +54,14 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // ✏️ Editar contato
+
   const editarContato = (contato) => {
     setEditandoId(contato.id);
     setNome(contato.nome);
     setTelefone(contato.telefone);
   };
 
-  // 💾 Salvar edição
+
   const salvarEdicao = async () => {
     if (!nome.trim() || !telefone.trim()) {
       Alert.alert('Atenção', 'Preencha nome e telefone.');
@@ -80,7 +80,7 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // ❌ Excluir contato
+
   const excluirContato = async (id) => {
   if (!id) {
     Alert.alert('Erro', 'ID do contato inválido.');
@@ -97,16 +97,15 @@ export default function HomeScreen({ navigation }) {
   }
 };
 
-  // 🚪 Logout
   const handleLogout = async () => {
     await signOut(auth);
     navigation.replace('Login');
   };
 
-  // 🖼️ Interface
+  
   return (
     <View style={styles.container}>
-      <Text h3 style={styles.title}>📞 Lista Telefônica</Text>
+      <Text h3 style={styles.title}> Lista Telefônica</Text>
 
       <TextInput
         style={styles.input}
@@ -172,7 +171,7 @@ export default function HomeScreen({ navigation }) {
   );
 }
 
-// 🎨 Estilos
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
