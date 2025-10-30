@@ -1,4 +1,4 @@
-// src/screens/LoginScreen.js
+
 import React, { useState } from 'react';
 import { View, TextInput, Button, Text, StyleSheet } from 'react-native';
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -11,7 +11,7 @@ export default function LoginScreen({ navigation }) {
   async function handleLogin() {
     try {
       await signInWithEmailAndPassword(auth, email.trim(), password);
-      // navega para Home (substitua por replace se preferir)
+      
       navigation.replace('Home');
     } catch (err) {
       alert('Erro ao fazer login: ' + err.message);
