@@ -13,7 +13,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 
-// ✅ URL do banco
+
 const databaseURL = "https://chiquinho-c79d3-default-rtdb.firebaseio.com";
 
 export { app, auth, databaseURL };
