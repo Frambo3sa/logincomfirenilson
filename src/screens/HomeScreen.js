@@ -9,32 +9,32 @@ export default function HomeScreen({ navigation }) {
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
   const [contatos, setContatos] = useState([]);
-  const [editandoId, setEditandoId] = useState(null); // 🔄 controla se está editando
+  const [editandoId, setEditandoId] = useState(null);
 
-  // Carrega contatos ao iniciar
+  // 🔽 Carrega contatos ao iniciar
   useEffect(() => {
     carregarContatos();
   }, []);
 
-  // 🔽 Buscar contatos do Firebase
+  // 🧠 Buscar contatos do Firebase
   const carregarContatos = async () => {
-  try {
-    const response = await axios.get(`${databaseURL}/contatos.json`);
-    if (response.data) {
-      const data = Object.entries(response.data).map(([id, value]) => ({
-        id,
-        nome: value.nome,
-        telefone: value.telefone,
-      }));
-      setContatos(data);
-    } else {
-      setContatos([]);
+    try {
+      const response = await axios.get(`${databaseURL}/contatos.json`);
+      if (response.data) {
+        const data = Object.entries(response.data).map(([id, value]) => ({
+          id,
+          nome: value.nome,
+          telefone: value.telefone,
+        }));
+        setContatos(data);
+      } else {
+        setContatos([]);
+      }
+    } catch (error) {
+      Alert.alert('Erro', 'Não foi possível carregar os contatos.');
+      console.error('Erro ao carregar contatos:', error);
     }
-  } catch (error) {
-    Alert.alert('Erro', 'Não foi possível carregar os contatos.');
-    console.error('Erro ao carregar:', error);
-  }
-};
+  };
 
   // ➕ Adicionar novo contato
   const adicionarContato = async () => {
@@ -50,11 +50,11 @@ export default function HomeScreen({ navigation }) {
       carregarContatos();
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível adicionar o contato.');
-      console.error(error);
+      console.error('Erro ao adicionar:', error);
     }
   };
 
-  // ✏️ Editar contato existente
+  // ✏️ Editar contato
   const editarContato = (contato) => {
     setEditandoId(contato.id);
     setNome(contato.nome);
@@ -76,35 +76,25 @@ export default function HomeScreen({ navigation }) {
       carregarContatos();
     } catch (error) {
       Alert.alert('Erro', 'Não foi possível editar o contato.');
-      console.error(error);
+      console.error('Erro ao salvar edição:', error);
     }
   };
 
   // ❌ Excluir contato
-const excluirContato = async (id) => {
+  const excluirContato = async (id) => {
   if (!id) {
     Alert.alert('Erro', 'ID do contato inválido.');
-    console.error('ID inválido:', id);
     return;
   }
 
-  Alert.alert('Excluir', 'Deseja realmente excluir este contato?', [
-    { text: 'Cancelar', style: 'cancel' },
-    {
-      text: 'Excluir',
-      style: 'destructive',
-      onPress: async () => {
-        try {
-          console.log('Excluindo contato com ID:', id);
-          await axios.delete(`${databaseURL}/contatos/${id}.json`);
-          carregarContatos();
-        } catch (error) {
-          Alert.alert('Erro', 'Não foi possível excluir o contato.');
-          console.error('Erro ao excluir contato:', error);
-        }
-      },
-    },
-  ]);
+  try {
+    console.log('🗑 Excluindo contato com ID:', id);
+    await axios.delete(`${databaseURL}/contatos/${id}.json`);
+    carregarContatos();
+  } catch (error) {
+    console.error('Erro ao excluir contato:', error);
+    Alert.alert('Erro', 'Não foi possível excluir o contato.');
+  }
 };
 
   // 🚪 Logout
@@ -113,6 +103,7 @@ const excluirContato = async (id) => {
     navigation.replace('Login');
   };
 
+  // 🖼️ Interface
   return (
     <View style={styles.container}>
       <Text h3 style={styles.title}>📞 Lista Telefônica</Text>
@@ -147,7 +138,7 @@ const excluirContato = async (id) => {
 
       <FlatList
         data={contatos}
-        keyExtractor={item => item.id}
+        keyExtractor={(item) => item.id.toString()}
         renderItem={({ item }) => (
           <ListItem bottomDivider>
             <Icon name="person" color="#3F51B5" />
@@ -168,7 +159,6 @@ const excluirContato = async (id) => {
               color="#F44336"
               onPress={() => excluirContato(item.id)}
             />
-
           </ListItem>
         )}
       />
@@ -182,6 +172,7 @@ const excluirContato = async (id) => {
   );
 }
 
+// 🎨 Estilos
 const styles = StyleSheet.create({
   container: {
     flex: 1,
